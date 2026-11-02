@@ -1,0 +1,238 @@
+{
+  "entities": {
+    "Customer": {
+      "title": "Customer",
+      "description": "A customer of the confectionery shop with credit balance, weekly SMS reminder settings, and contact details.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the shop owner."
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the customer."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Phone number for SMS alerts and weekly credit reports."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Customer preferences or notes."
+        },
+        "creditBalance": {
+          "type": "number",
+          "description": "Current outstanding credit balance owed by the customer."
+        },
+        "totalBilled": {
+          "type": "number",
+          "description": "Cumulative amount billed to this customer."
+        },
+        "totalPaid": {
+          "type": "number",
+          "description": "Cumulative amount paid/submitted by this customer."
+        },
+        "weeklyReminderEnabled": {
+          "type": "boolean",
+          "description": "Whether weekly SMS credit reminders are enabled for this customer."
+        },
+        "lastReminderSentAt": {
+          "type": "string",
+          "description": "Formatted timestamp of the last SMS reminder or report sent."
+        },
+        "loyaltyPoints": {
+          "type": "integer",
+          "description": "Confectionery loyalty reward points earned by the customer."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when customer record was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when customer record was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "phone",
+        "notes",
+        "creditBalance",
+        "totalBilled",
+        "totalPaid",
+        "weeklyReminderEnabled",
+        "lastReminderSentAt",
+        "loyaltyPoints",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "A confectionery product or stock item with pricing, quantity, low-stock threshold, and expiry date.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the shop owner."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the confectionery item."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category such as Chocolates, Traditional Sweets, Pastries, Gift Hampers."
+        },
+        "sku": {
+          "type": "string",
+          "description": "Item SKU or batch code."
+        },
+        "unit": {
+          "type": "string",
+          "description": "Unit of measurement (box, kg, pack, pc)."
+        },
+        "price": {
+          "type": "number",
+          "description": "Selling price per unit."
+        },
+        "costPrice": {
+          "type": "number",
+          "description": "Cost price per unit."
+        },
+        "stockQuantity": {
+          "type": "integer",
+          "description": "Available quantity in stock."
+        },
+        "lowStockThreshold": {
+          "type": "integer",
+          "description": "Threshold at or below which low stock alert triggers."
+        },
+        "expiryDate": {
+          "type": "string",
+          "description": "Batch expiry or best-before date (YYYY-MM-DD)."
+        },
+        "supplierName": {
+          "type": "string",
+          "description": "Supplier or kitchen batch source."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when item was created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when item was last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "name",
+        "category",
+        "sku",
+        "unit",
+        "price",
+        "costPrice",
+        "stockQuantity",
+        "lowStockThreshold",
+        "expiryDate",
+        "supplierName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ShopTransaction": {
+      "title": "ShopTransaction",
+      "description": "An itemized purchase bill or credit payment record with date/time and customer link.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "UID of the shop owner."
+        },
+        "customerId": {
+          "type": "string",
+          "description": "ID of the customer or walk_in."
+        },
+        "customerName": {
+          "type": "string",
+          "description": "Display name of the customer."
+        },
+        "customerPhone": {
+          "type": "string",
+          "description": "Phone number of the customer."
+        },
+        "type": {
+          "type": "string",
+          "enum": ["CREDIT_SALE", "CASH_SALE", "CREDIT_PAYMENT"],
+          "description": "Type of shop ledger transaction."
+        },
+        "itemsSummary": {
+          "type": "string",
+          "description": "Itemized breakdown of what was bought or payment note."
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total bill amount for the purchase."
+        },
+        "paidAmount": {
+          "type": "number",
+          "description": "Amount paid/submitted by the customer during this transaction."
+        },
+        "balanceDelta": {
+          "type": "number",
+          "description": "Net change to customer credit balance (totalAmount - paidAmount)."
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["CREDIT", "CASH", "UPI_CARD"],
+          "description": "Payment mode used."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when transaction occurred (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when transaction was updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "customerId",
+        "customerName",
+        "customerPhone",
+        "type",
+        "itemsSummary",
+        "totalAmount",
+        "paidAmount",
+        "balanceDelta",
+        "paymentMethod",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Per-owner collection of confectionery shop customers and their credit balances."
+    },
+    "/users/{userId}/inventory/{itemId}": {
+      "schema": { "$ref": "#/entities/InventoryItem" },
+      "description": "Per-owner collection of confectionery stock items, prices, and batch expiry dates."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/ShopTransaction" },
+      "description": "Per-owner collection of itemized customer purchases, bills, and credit payments."
+    }
+  }
+}

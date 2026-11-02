@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Sandeep Cafe</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="welcome_subtitle">Sandeep Cafe Daily Credit Khata (₹), Automated Weekly SMS Alerts, Stock &amp; Billing Manager</string>
+    <string name="tab_overview">Cafe Home</string>
+    <string name="tab_customers">Customers</string>
+    <string name="tab_billing">Billing</string>
+    <string name="tab_inventory">Stocks</string>
+    <string name="tab_ai_studio">Studio &amp; Ideas</string>
+</resources>

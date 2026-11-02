@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Storefront Awning & Ledger Silhouette inside 66dp safe zone (21..87) -->
+    <path
+        android:fillColor="#FFD166"
+        android:pathData="M28,30h52l5,12v4c0,3.87 -3.13,7 -7,7c-2.8,0 -5.2,-1.64 -6.32,-4c-1.12,2.36 -3.52,4 -6.32,4c-2.8,0 -5.2,-1.64 -6.36,-4c-1.16,2.36 -3.56,4 -6.36,4c-2.8,0 -5.2,-1.64 -6.32,-4c-1.12,2.36 -3.52,4 -6.32,4c-3.87,0 -7,-3.13 -7,-7v-4L28,30z" />
+    <!-- Shop Counter & Ledger Body -->
+    <path
+        android:fillColor="#FFF6EB"
+        android:pathData="M31,51h46v24c0,2.76 -2.24,5 -5,5H36c-2.76,0 -5,-2.24 -5,-5V51z" />
+    <!-- Wrapped Candy Icon inside Counter -->
+    <path
+        android:fillColor="#7B2D43"
+        android:pathData="M43,60l-6,-4v14l6,-4c1.8,2.4 4.7,4 8,4h6c3.3,0 6.2,-1.6 8,-4l6,4V56l-6,4c-1.8,-2.4 -4.7,-4 -8,-4h-6C47.7,56 44.8,57.6 43,60z" />
+    <path
+        android:fillColor="#FFD166"
+        android:pathData="M54,63m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+</vector>

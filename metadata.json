@@ -1,0 +1,6 @@
+{
+  "name": "Sandeep Cafe",
+  "description": "Sandeep Cafe & Confectionery manager for daily customer credit (₹), automated weekly SMS alerts, itemized billing, stock tracking, and AI product visuals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

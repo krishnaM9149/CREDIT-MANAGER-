@@ -1,0 +1,160 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Pillar 1: Global Default-Deny Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isNumber(val) {
+      return val is int || val is float;
+    }
+
+    function isValidCustomer(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'name', 'phone', 'notes',
+               'creditBalance', 'totalBilled', 'totalPaid',
+               'weeklyReminderEnabled', 'lastReminderSentAt',
+               'loyaltyPoints', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'phone', 'notes',
+               'creditBalance', 'totalBilled', 'totalPaid',
+               'weeklyReminderEnabled', 'lastReminderSentAt',
+               'loyaltyPoints', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 25 &&
+             data.notes is string && data.notes.size() <= 300 &&
+             isNumber(data.creditBalance) &&
+             isNumber(data.totalBilled) && data.totalBilled >= 0 &&
+             isNumber(data.totalPaid) && data.totalPaid >= 0 &&
+             data.weeklyReminderEnabled is bool &&
+             data.lastReminderSentAt is string && data.lastReminderSentAt.size() <= 60 &&
+             data.loyaltyPoints is int && data.loyaltyPoints >= 0 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidInventoryItem(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'name', 'category', 'sku', 'unit',
+               'price', 'costPrice', 'stockQuantity', 'lowStockThreshold',
+               'expiryDate', 'supplierName', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'name', 'category', 'sku', 'unit',
+               'price', 'costPrice', 'stockQuantity', 'lowStockThreshold',
+               'expiryDate', 'supplierName', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 50 &&
+             data.sku is string && data.sku.size() >= 1 && data.sku.size() <= 40 &&
+             data.unit is string && data.unit.size() >= 1 && data.unit.size() <= 20 &&
+             isNumber(data.price) && data.price >= 0 &&
+             isNumber(data.costPrice) && data.costPrice >= 0 &&
+             data.stockQuantity is int && data.stockQuantity >= 0 &&
+             data.lowStockThreshold is int && data.lowStockThreshold >= 0 &&
+             data.expiryDate is string && data.expiryDate.size() <= 30 &&
+             data.supplierName is string && data.supplierName.size() <= 100 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidTransaction(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'customerId', 'customerName', 'customerPhone',
+               'type', 'itemsSummary', 'totalAmount', 'paidAmount',
+               'balanceDelta', 'paymentMethod', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'customerId', 'customerName', 'customerPhone',
+               'type', 'itemsSummary', 'totalAmount', 'paidAmount',
+               'balanceDelta', 'paymentMethod', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.customerId is string && data.customerId.size() >= 1 && data.customerId.size() <= 128 &&
+             data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 100 &&
+             data.customerPhone is string && data.customerPhone.size() <= 25 &&
+             data.type is string && data.type in ['CREDIT_SALE', 'CASH_SALE', 'CREDIT_PAYMENT'] &&
+             data.itemsSummary is string && data.itemsSummary.size() >= 1 && data.itemsSummary.size() <= 500 &&
+             isNumber(data.totalAmount) && data.totalAmount >= 0 &&
+             isNumber(data.paidAmount) && data.paidAmount >= 0 &&
+             isNumber(data.balanceDelta) &&
+             data.paymentMethod is string && data.paymentMethod in ['CREDIT', 'CASH', 'UPI_CARD'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    match /users/{userId}/customers/{customerId} {
+      allow get: if isOwner(userId) && isValidId(customerId) && existing().userId == request.auth.uid;
+      allow list: if isOwner(userId) && existing().userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(customerId) && isValidCustomer(incoming(), userId);
+      allow update: if isOwner(userId) &&
+                       isValidId(customerId) &&
+                       isValidCustomer(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'phone', 'notes', 'creditBalance',
+                         'totalBilled', 'totalPaid', 'weeklyReminderEnabled',
+                         'lastReminderSentAt', 'loyaltyPoints', 'updatedAt'
+                       ]);
+      allow delete: if isOwner(userId) && isValidId(customerId) && existing().userId == request.auth.uid;
+    }
+
+    match /users/{userId}/inventory/{itemId} {
+      allow get: if isOwner(userId) && isValidId(itemId) && existing().userId == request.auth.uid;
+      allow list: if isOwner(userId) && existing().userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(itemId) && isValidInventoryItem(incoming(), userId);
+      allow update: if isOwner(userId) &&
+                       isValidId(itemId) &&
+                       isValidInventoryItem(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'name', 'category', 'sku', 'unit',
+                         'price', 'costPrice', 'stockQuantity', 'lowStockThreshold',
+                         'expiryDate', 'supplierName', 'updatedAt'
+                       ]);
+      allow delete: if isOwner(userId) && isValidId(itemId) && existing().userId == request.auth.uid;
+    }
+
+    match /users/{userId}/transactions/{transactionId} {
+      allow get: if isOwner(userId) && isValidId(transactionId) && existing().userId == request.auth.uid;
+      allow list: if isOwner(userId) && existing().userId == request.auth.uid;
+      allow create: if isOwner(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId);
+      allow update: if isOwner(userId) &&
+                       isValidId(transactionId) &&
+                       isValidTransaction(incoming(), userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly([
+                         'itemsSummary', 'paidAmount', 'balanceDelta', 'paymentMethod', 'updatedAt'
+                       ]);
+      allow delete: if isOwner(userId) && isValidId(transactionId) && existing().userId == request.auth.uid;
+    }
+  }
+}
